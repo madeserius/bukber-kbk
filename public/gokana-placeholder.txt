@@ -1,0 +1,9 @@
+PLACEHOLDER: Ganti file ini dengan gokana.png
+
+Instructions:
+1. Simpan logo/image Gokana dengan nama: gokana.png
+2. Taruh di folder public/
+3. Recommended size: 500x500px (square)
+4. Format: PNG (transparent background) atau JPG
+
+Jika file gokana.png sudah ada, Anda bisa hapus file placeholder ini.
