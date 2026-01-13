@@ -27,6 +27,14 @@ yarn-error.log*
 # local env files
 .env*.local
 
+# Google credentials
+google-credentials*.json
+rsvp-bukber-kbk-*.json
+
+# RSVP data
+/data
+rsvp-data.json
+
 # vercel
 .vercel
 

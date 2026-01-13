@@ -9,7 +9,7 @@ export default function RSVPForm() {
   const [formData, setFormData] = useState({
     nama: '',
     kehadiran: '',
-    jumlah: 1,
+    jumlah: null, // Changed from 1 to empty string
     catatan: ''
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -28,21 +28,40 @@ export default function RSVPForm() {
     setSubmitStatus('idle')
 
     try {
-      const response = await fetch('/api/rsvp', {
+      // Smart endpoint detection: use Next.js API in dev, Netlify Function in production
+      const endpoint = process.env.NODE_ENV === 'development'
+        ? '/api/rsvp'
+        : '/.netlify/functions/rsvp'
+
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          nama: formData.nama,
+          kehadiran: formData.kehadiran,
+          jumlah: formData.kehadiran === 'hadir' ? formData.jumlah : 0,
+          catatan: formData.catatan
+        })
       })
+
+      const result = await response.json()
 
       if (response.ok) {
         setSubmitStatus('success')
-        // Reset form after success
+        // Reset form after success (except nama)
         setTimeout(() => {
+          setFormData(prev => ({
+            nama: prev.nama, // Keep the name
+            kehadiran: '',
+            jumlah: null, // Changed from empty string to null
+            catatan: ''
+          }))
           setSubmitStatus('idle')
         }, 3000)
       } else {
+        console.error('API Error:', result.error)
         setSubmitStatus('error')
       }
     } catch (error) {
@@ -57,7 +76,7 @@ export default function RSVPForm() {
     const { name, value } = e.target
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'jumlah' ? parseInt(value) || 1 : value
+      [name]: name === 'jumlah' ? parseInt(value) || null : value
     }))
   }
 
@@ -167,13 +186,13 @@ export default function RSVPForm() {
                 Jumlah Orang
               </label>
               <input
-                type="number"
+                type="string"
                 name="jumlah"
-                value={formData.jumlah}
+                value={formData.jumlah || ''}
                 onChange={handleChange}
                 min="1"
                 max="10"
-                required
+              required
                 className="w-full px-4 py-3 border-2 border-brown/30 rounded-lg focus:border-gold focus:outline-none bg-white text-brown transition-colors"
               />
             </motion.div>
